@@ -1,0 +1,63 @@
+Import('env')
+
+examples = {
+
+    "allocation_server"             : 'allocation/server.cpp',
+    "buffers_reference_counted"     : 'buffers/reference_counted.cpp',
+    "chat_chat_client"              : 'chat/chat_client.cpp',
+    "chat_chat_server"              : 'chat/chat_server.cpp',
+    "echo_async_tcp_echo_server"    : 'echo/async_tcp_echo_server.cpp',
+    "echo_async_udp_echo_server"    : 'echo/async_udp_echo_server.cpp',
+    "echo_blocking_tcp_echo_client" : 'echo/blocking_tcp_echo_client.cpp',
+    "echo_blocking_tcp_echo_server" : 'echo/blocking_tcp_echo_server.cpp',
+    "echo_blocking_udp_echo_client" : 'echo/blocking_udp_echo_client.cpp',
+    "echo_blocking_udp_echo_server" : 'echo/blocking_udp_echo_server.cpp',
+
+    "executors_actor"               : 'executors/actor.cpp',
+    "executors_bank_account_1"      : 'executors/bank_account_1.cpp',
+    "executors_bank_account_2"      : 'executors/bank_account_2.cpp',
+    "executors_fork_join"           : 'executors/fork_join.cpp',
+    "executors_pipeline"            : 'executors/pipeline.cpp',
+    "executors_priority_scheduler"  : 'executors/priority_scheduler.cpp',
+    "futures_daytime_client"        : 'futures/daytime_client.cpp',
+
+    "http_server_http_server": """
+            http/server/connection.cpp
+            http/server/connection_manager.cpp
+            http/server/main.cpp
+            http/server/mime_types.cpp
+            http/server/reply.cpp
+            http/server/request_handler.cpp
+            http/server/request_parser.cpp
+            http/server/server.cpp
+    """,
+}
+
+
+for example, sources in examples.iteritems():
+    env.Build( example, Split( sources ) )
+
+
+if env.Using('boost'):
+    env.Build(
+            "spawn_echo_server",
+            'spawn/echo_server.cpp',
+            STATICLIBS = [ env.BoostStaticLibrary( 'coroutine' ), env.BoostStaticLibrary( 'context' ), env.BoostStaticLibrary( 'system' ) ]
+    )
+
+
+
+#noinst_HEADERS = \
+#	chat/chat_message.hpp
+
+#EXTRA_DIST = \
+#	http/server/connection.hpp \
+#	http/server/connection_manager.hpp \
+#	http/server/header.hpp \
+#	http/server/mime_types.hpp \
+#	http/server/reply.hpp \
+#	http/server/request.hpp \
+#	http/server/request_handler.hpp \
+#	http/server/request_parser.hpp \
+#	http/server/server.hpp
+

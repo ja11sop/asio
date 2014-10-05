@@ -1,0 +1,43 @@
+import cuppa
+import os
+
+
+cuppa.add_option( '--enable-separate-compilation', dest='enable-separate-compilation', action='store_true',
+                  help='Enable separate compilation of asio source' )
+
+cuppa.add_option( '--standalone', dest='standalone', action='store_true',
+                  help='Build as a standalone library, separate from boost. To run examples depending on boost, set --boost-home' )
+
+
+
+def default_profile( env, toolchain, variant ):
+    env.AppendUnique( INCPATH = '#/include' )
+
+    if env.get_option( 'standalone' ) or not env.Using('boost'):
+        env.AppendUnique( STANDALONE = True )
+        env.MergeFlags( '-DASIO_STANDALONE' )
+
+    if toolchain.family() == "gcc":
+        env.MergeFlags( '-ftemplate-depth-256' )
+
+    if env.get_option( 'enable-separate-compilation' ):
+        env.MergeFlags( '-DASIO_SEPARATE_COMPILATION' )
+        env.AppendUnique( SEPARATE_COMPILATION = True )
+        asio_sources = ['src/asio.cpp']
+        if 'HAVE_OPENSSL' in env:
+            asio_sources.append('src/asio_ssl.cpp')
+
+        env.AppendUnique( STATICLIBS = env.BuildStaticLib( "asio", env.Compile( asio_sources ) ) )
+
+
+
+def configure( context ):
+    if context.CheckCHeader('openssl/ssl.h'):
+        context.env.AppendUnique( HAVE_OPENSSL = True )
+
+
+
+cuppa.run(
+    default_profiles = [ default_profile ],
+    configure_callback = configure
+)

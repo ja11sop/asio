@@ -1,0 +1,160 @@
+Import('env')
+
+
+if 'STANDALONE' in env:
+    print "asio: Removing NDEBUG for STANDALONE test builds"
+    env.Replace( CPPDEFINES=[ d for d in env['CPPDEFINES'] if d != 'NDEBUG' ] )
+
+
+not_standalone_sources = """
+    latency/tcp_client.cpp
+    latency/tcp_server.cpp
+    latency/udp_client.cpp
+    latency/udp_server.cpp
+    performance/client.cpp
+    performance/server.cpp
+"""
+
+
+def name_from( source ):
+    return source[:-4].replace('/','_')
+
+
+if not 'STANDALONE' in env:
+    for source in Split( not_standalone_sources ):
+        env.Build( name_from( source ), source )
+
+
+def BuildTests( sources, LIBS=[] ):
+
+    def unit_test( sources ):
+        return [ 'unit/unit_test.cpp' ] + Flatten( [ sources ] )
+
+    for source in sources:
+        env.BuildTest( name_from( source ), unit_test( source ), LIBS=LIBS )
+
+tests = """
+    unit/basic_datagram_socket.cpp
+    unit/basic_deadline_timer.cpp
+    unit/basic_raw_socket.cpp
+    unit/basic_seq_packet_socket.cpp
+    unit/basic_serial_port.cpp
+    unit/basic_signal_set.cpp
+    unit/basic_socket_acceptor.cpp
+    unit/basic_stream_socket.cpp
+    unit/basic_streambuf.cpp
+    unit/basic_waitable_timer.cpp
+    unit/buffer.cpp
+    unit/buffers_iterator.cpp
+    unit/buffered_read_stream.cpp
+    unit/buffered_stream.cpp
+    unit/buffered_write_stream.cpp
+    unit/completion_condition.cpp
+    unit/connect.cpp
+    unit/coroutine.cpp
+    unit/datagram_socket_service.cpp
+    unit/deadline_timer_service.cpp
+    unit/deadline_timer.cpp
+    unit/error.cpp
+    unit/generic/basic_endpoint.cpp
+    unit/generic/datagram_protocol.cpp
+    unit/generic/raw_protocol.cpp
+    unit/generic/seq_packet_protocol.cpp
+    unit/generic/stream_protocol.cpp
+    unit/high_resolution_timer.cpp
+    unit/io_service.cpp
+    unit/ip/address.cpp
+    unit/ip/address_v4.cpp
+    unit/ip/address_v6.cpp
+    unit/ip/basic_endpoint.cpp
+    unit/ip/basic_resolver.cpp
+    unit/ip/basic_resolver_entry.cpp
+    unit/ip/basic_resolver_iterator.cpp
+    unit/ip/basic_resolver_query.cpp
+    unit/ip/host_name.cpp
+    unit/ip/icmp.cpp
+    unit/ip/multicast.cpp
+    unit/ip/resolver_query_base.cpp
+    unit/ip/resolver_service.cpp
+    unit/ip/tcp.cpp
+    unit/ip/udp.cpp
+    unit/ip/unicast.cpp
+    unit/ip/v6_only.cpp
+    unit/is_read_buffered.cpp
+    unit/is_write_buffered.cpp
+    unit/local/basic_endpoint.cpp
+    unit/local/connect_pair.cpp
+    unit/local/datagram_protocol.cpp
+    unit/local/stream_protocol.cpp
+    unit/placeholders.cpp
+    unit/posix/basic_descriptor.cpp
+    unit/posix/basic_stream_descriptor.cpp
+    unit/posix/descriptor_base.cpp
+    unit/posix/stream_descriptor.cpp
+    unit/posix/stream_descriptor_service.cpp
+    unit/raw_socket_service.cpp
+    unit/read.cpp
+    unit/read_at.cpp
+    unit/read_until.cpp
+    unit/seq_packet_socket_service.cpp
+    unit/serial_port.cpp
+    unit/serial_port_base.cpp
+    unit/serial_port_service.cpp
+    unit/signal_set.cpp
+    unit/signal_set_service.cpp
+    unit/socket_acceptor_service.cpp
+    unit/socket_base.cpp
+    unit/steady_timer.cpp
+    unit/strand.cpp
+    unit/stream_socket_service.cpp
+    unit/streambuf.cpp
+    unit/system_timer.cpp
+    unit/thread.cpp
+    unit/time_traits.cpp
+    unit/wait_traits.cpp
+    unit/waitable_timer_service.cpp
+    unit/windows/basic_handle.cpp
+    unit/windows/basic_object_handle.cpp
+    unit/windows/basic_random_access_handle.cpp
+    unit/windows/basic_stream_handle.cpp
+    unit/windows/object_handle.cpp
+    unit/windows/object_handle_service.cpp
+    unit/windows/overlapped_ptr.cpp
+    unit/windows/random_access_handle.cpp
+    unit/windows/random_access_handle_service.cpp
+    unit/windows/stream_handle.cpp
+    unit/windows/stream_handle_service.cpp
+    unit/write.cpp
+    unit/write_at.cpp
+"""
+
+BuildTests( Split( tests ) )
+
+ssl_tests = """
+    unit/ssl/context_base.cpp
+    unit/ssl/context.cpp
+    unit/ssl/stream_base.cpp
+    unit/ssl/rfc2818_verification.cpp
+    unit/ssl/stream.cpp
+"""
+
+if 'HAVE_OPENSSL' in env:
+    BuildTests( Split( ssl_tests ), LIBS = ['ssl', 'crypto'] )
+
+
+#noinst_HEADERS = \
+    #latency/coroutine.hpp \
+    #latency/high_res_clock.hpp \
+    #latency/unyield.hpp \
+    #latency/yield.hpp \
+    #unit/unit_test.hpp
+
+#EXTRA_DIST = \
+    #latency/allocator.hpp \
+    #performance/handler_allocator.hpp \
+    #unit/archetypes/async_result.hpp \
+    #unit/archetypes/gettable_socket_option.hpp \
+    #unit/archetypes/io_control_command.hpp \
+    #unit/archetypes/settable_socket_option.hpp
+
+

@@ -1,0 +1,204 @@
+Import('env')
+
+if 'STANDALONE' in env:
+    Return()
+
+examples = {
+
+    "allocation_server"             : 'allocation/server.cpp',
+    "buffers_reference_counted"     : 'buffers/reference_counted.cpp',
+    "chat_chat_client"              : 'chat/chat_client.cpp',
+    "chat_chat_server"              : 'chat/chat_server.cpp',
+    "echo_async_tcp_echo_server"    : 'echo/async_tcp_echo_server.cpp',
+    "echo_async_udp_echo_server"    : 'echo/async_udp_echo_server.cpp',
+    "echo_blocking_tcp_echo_client" : 'echo/blocking_tcp_echo_client.cpp',
+    "echo_blocking_tcp_echo_server" : 'echo/blocking_tcp_echo_server.cpp',
+    "echo_blocking_udp_echo_client" : 'echo/blocking_udp_echo_client.cpp',
+    "echo_blocking_udp_echo_server" : 'echo/blocking_udp_echo_server.cpp',
+    "http_client_async_client"      : 'http/client/async_client.cpp',
+    "http_client_sync_client"       : 'http/client/sync_client.cpp',
+
+    "http_server_http_server": """
+            http/server/connection.cpp
+            http/server/connection_manager.cpp
+            http/server/main.cpp
+            http/server/mime_types.cpp
+            http/server/reply.cpp
+            http/server/request_handler.cpp
+            http/server/request_parser.cpp
+            http/server/server.cpp
+    """,
+
+    "http_server2_http_server": """
+            http/server2/connection.cpp
+            http/server2/io_service_pool.cpp
+            http/server2/main.cpp
+            http/server2/mime_types.cpp
+            http/server2/reply.cpp
+            http/server2/request_handler.cpp
+            http/server2/request_parser.cpp
+            http/server2/server.cpp
+    """,
+
+    "http_server3_http_server": """
+            http/server3/connection.cpp
+            http/server3/main.cpp
+            http/server3/mime_types.cpp
+            http/server3/reply.cpp
+            http/server3/request_handler.cpp
+            http/server3/request_parser.cpp
+            http/server3/server.cpp
+    """,
+
+    "http_server4_http_server": """
+            http/server4/file_handler.cpp
+            http/server4/main.cpp
+            http/server4/mime_types.cpp
+            http/server4/reply.cpp
+            http/server4/request_parser.cpp
+            http/server4/server.cpp
+    """,
+
+    "icmp_ping"                         : 'icmp/ping.cpp',
+    "invocation_prioritised_handlers"   : 'invocation/prioritised_handlers.cpp',
+    "iostreams_daytime_client"          : 'iostreams/daytime_client.cpp',
+    "iostreams_daytime_server"          : 'iostreams/daytime_server.cpp',
+    "iostreams_http_client"             : 'iostreams/http_client.cpp',
+    "multicast_receiver"                : 'multicast/receiver.cpp',
+    "multicast_sender"                  : 'multicast/sender.cpp',
+    "nonblocking_third_party_lib"       : 'nonblocking/third_party_lib.cpp',
+    "porthopper_client"                 : 'porthopper/client.cpp',
+    "porthopper_server"                 : 'porthopper/server.cpp',
+
+    "services_daytime_client": """
+            services/daytime_client.cpp
+            services/logger_service.cpp
+    """,
+
+    "socks4_sync_client"            : 'socks4/sync_client.cpp',
+    "timeouts_async_tcp_client"     : 'timeouts/async_tcp_client.cpp',
+    "timeouts_blocking_tcp_client"  : 'timeouts/blocking_tcp_client.cpp',
+    "timeouts_blocking_udp_client"  : 'timeouts/blocking_udp_client.cpp',
+    "timeouts_server"               : 'timeouts/server.cpp',
+    "timers_time_t_timer"           : 'timers/time_t_timer.cpp',
+    "tutorial_timer1_timer"         : 'tutorial/timer1/timer.cpp',
+    "tutorial_timer2_timer"         : 'tutorial/timer2/timer.cpp',
+    "tutorial_timer3_timer"         : 'tutorial/timer3/timer.cpp',
+    "tutorial_timer4_timer"         : 'tutorial/timer4/timer.cpp',
+    "tutorial_timer5_timer"         : 'tutorial/timer5/timer.cpp',
+    "tutorial_daytime1_client"      : 'tutorial/daytime1/client.cpp',
+    "tutorial_daytime2_server"      : 'tutorial/daytime2/server.cpp',
+    "tutorial_daytime3_server"      : 'tutorial/daytime3/server.cpp',
+    "tutorial_daytime4_client"      : 'tutorial/daytime4/client.cpp',
+    "tutorial_daytime5_server"      : 'tutorial/daytime5/server.cpp',
+    "tutorial_daytime6_server"      : 'tutorial/daytime6/server.cpp',
+    "tutorial_daytime7_server"      : 'tutorial/daytime7/server.cpp',
+
+}
+
+import os
+
+if os.name != 'nt':
+    examples.update( {
+        "chat_posix_chat_client"        : 'chat/posix_chat_client.cpp',
+        "fork_daemon"                   : 'fork/daemon.cpp',
+        "fork_process_per_connection"   : 'fork/process_per_connection.cpp',
+        "local_connect_pair"            : 'local/connect_pair.cpp',
+        "local_iostream_client"         : 'local/iostream_client.cpp',
+        "local_stream_server"           : 'local/stream_server.cpp',
+        "local_stream_client"           : 'local/stream_client.cpp',
+    } )
+
+
+if os.name == 'nt':
+    examples.update( {
+        "windows_transmit_file": 'windows/transmit_file.cpp',
+    } )
+
+
+for example, sources in examples.iteritems():
+    env.Build( example, Split( sources ) )
+
+
+if 'HAVE_OPEN_SSL' in env:
+    ssl_examples = {
+        "ssl_client": 'ssl/client.cpp',
+        "ssl_server": 'ssl/server.cpp',
+    }
+
+    for example, sources in ssl_examples.iteritems():
+        env.Build( example, Split( sources ), LIBS=['ssl', 'crypto'] )
+
+
+if env.Using('boost'):
+
+    print "Using Boost"
+    env.Build(
+            "spawn_echo_server",
+            'spawn/echo_server.cpp',
+            STATICLIBS = [ env.BoostStaticLibrary( 'coroutine' ), env.BoostStaticLibrary( 'context' ), env.BoostStaticLibrary( 'system' ) ]
+    )
+
+
+#noinst_HEADERS = \
+#	chat/chat_message.hpp \
+#	services/basic_logger.hpp \
+#	services/logger.hpp \
+#	services/logger_service.hpp \
+#	services/stream_socket_service.hpp
+#
+
+
+#EXTRA_DIST = \
+#	http/server/connection.hpp \
+#	http/server/connection_manager.hpp \
+#	http/server/header.hpp \
+#	http/server/mime_types.hpp \
+#	http/server/reply.hpp \
+#	http/server/request.hpp \
+#	http/server/request_handler.hpp \
+#	http/server/request_parser.hpp \
+#	http/server/server.hpp \
+#	http/server2/connection.hpp \
+#	http/server2/io_service_pool.hpp \
+#	http/server2/header.hpp \
+#	http/server2/mime_types.hpp \
+#	http/server2/reply.hpp \
+#	http/server2/request.hpp \
+#	http/server2/request_handler.hpp \
+#	http/server2/request_parser.hpp \
+#	http/server2/server.hpp \
+#	http/server3/connection.hpp \
+#	http/server3/header.hpp \
+#	http/server3/mime_types.hpp \
+#	http/server3/reply.hpp \
+#	http/server3/request.hpp \
+#	http/server3/request_handler.hpp \
+#	http/server3/request_parser.hpp \
+#	http/server3/server.hpp \
+#	http/server4/file_handler.hpp \
+#	http/server4/header.hpp \
+#	http/server4/mime_types.hpp \
+#	http/server4/reply.hpp \
+#	http/server4/request.hpp \
+#	http/server4/request_parser.hpp \
+#	http/server4/server.hpp \
+#	icmp/icmp_header.hpp \
+#	icmp/ipv4_header.hpp \
+#	porthopper/protocol.hpp \
+#	serialization/client.cpp \
+#	serialization/server.cpp \
+#	serialization/connection.hpp \
+#	serialization/stock.hpp \
+#	services/basic_logger.hpp \
+#	services/logger.hpp \
+#	services/logger_service.hpp \
+#	services/stream_socket_service.hpp \
+#	socks4/socks4.hpp \
+#	ssl/README \
+#	ssl/ca.pem \
+#	ssl/server.pem \
+#	ssl/dh512.pem \
+#	timers/tick_count_timer.cpp
+
+

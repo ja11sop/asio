@@ -1,0 +1,19 @@
+Import('env')
+
+examples = {
+
+    "executors_actor"               : 'executors/actor.cpp',
+    "executors_async_1"             : 'executors/async_1.cpp',
+    "executors_async_2"             : 'executors/async_2.cpp',
+    "executors_bank_account_1"      : 'executors/bank_account_1.cpp',
+    "executors_bank_account_2"      : 'executors/bank_account_2.cpp',
+    "executors_fork_join"           : 'executors/fork_join.cpp',
+    "executors_pipeline"            : 'executors/pipeline.cpp',
+    "executors_priority_scheduler"  : 'executors/priority_scheduler.cpp',
+}
+
+for example, sources in examples.iteritems():
+    env.Build( example, Split( sources ) )
+
+
+
