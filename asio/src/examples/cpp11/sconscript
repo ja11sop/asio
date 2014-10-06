@@ -31,6 +31,8 @@ examples = {
             http/server/request_parser.cpp
             http/server/server.cpp
     """,
+
+    "iostreams_http_client" : 'iostreams/http_client.cpp',
 }
 
 
