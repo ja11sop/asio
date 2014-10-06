@@ -131,8 +131,6 @@ if 'HAVE_OPEN_SSL' in env:
 
 
 if env.Using('boost'):
-
-    print "Using Boost"
     env.Build(
             "spawn_echo_server",
             'spawn/echo_server.cpp',
