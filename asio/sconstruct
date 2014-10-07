@@ -20,12 +20,20 @@ def default_profile( env, toolchain, variant ):
     if toolchain.family() == "gcc":
         env.MergeFlags( '-ftemplate-depth-256' )
 
+    if toolchain.family() == "cl":
+        env.MergeFlags( '-D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0501 -DBOOST_ALL_NO_LIB' )
+        env.AppendUnique( LIBS = ['ws2_32', 'mswsock' ] )
+
     if env.get_option( 'enable-separate-compilation' ):
         env.MergeFlags( '-DASIO_SEPARATE_COMPILATION' )
         env.AppendUnique( SEPARATE_COMPILATION = True )
         asio_sources = ['src/asio.cpp']
         if 'HAVE_OPENSSL' in env:
             asio_sources.append('src/asio_ssl.cpp')
+
+        if toolchain.family() == "cl":
+            env.AppendUnique( LIBS = "asio" )
+            env.MergeFlags( '-DASIO_ENABLE_CANCELIO' )
 
         env.AppendUnique( STATICLIBS = env.BuildStaticLib( "asio", env.Compile( asio_sources ) ) )
 
