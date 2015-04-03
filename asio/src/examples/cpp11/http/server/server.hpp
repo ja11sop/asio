@@ -2,7 +2,7 @@
 // server.hpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -53,9 +53,6 @@ private:
 
   /// The connection manager which owns all live connections.
   connection_manager connection_manager_;
-
-  /// The next socket to be accepted.
-  asio::ip::tcp::socket socket_;
 
   /// The handler for all incoming requests.
   request_handler request_handler_;

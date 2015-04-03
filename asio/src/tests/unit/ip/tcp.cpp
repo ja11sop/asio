@@ -2,7 +2,7 @@
 // tcp.cpp
 // ~~~~~~~
 //
-// Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -244,7 +244,8 @@ void test()
     ip::tcp::socket socket4(ios, ip::tcp::endpoint(ip::tcp::v4(), 0));
     ip::tcp::socket socket5(ios, ip::tcp::endpoint(ip::tcp::v6(), 0));
 #if !defined(ASIO_WINDOWS_RUNTIME)
-    int native_socket1 = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ip::tcp::socket::native_handle_type native_socket1
+      = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     ip::tcp::socket socket6(ios, ip::tcp::v4(), native_socket1);
 #endif // !defined(ASIO_WINDOWS_RUNTIME)
 
@@ -283,9 +284,11 @@ void test()
     socket1.open(ip::tcp::v6(), ec);
 
 #if !defined(ASIO_WINDOWS_RUNTIME)
-    int native_socket2 = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ip::tcp::socket::native_handle_type native_socket2
+      = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     socket1.assign(ip::tcp::v4(), native_socket2);
-    int native_socket3 = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ip::tcp::socket::native_handle_type native_socket3
+      = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     socket1.assign(ip::tcp::v4(), native_socket3, ec);
 #endif // !defined(ASIO_WINDOWS_RUNTIME)
 
@@ -700,6 +703,17 @@ private:
 #endif // defined(ASIO_HAS_MOVE)
 };
 
+#if defined(ASIO_HAS_MOVE)
+struct move_accept_handler
+{
+  move_accept_handler() {}
+  void operator()(const asio::error_code&, asio::ip::tcp::socket) {}
+  move_accept_handler(move_accept_handler&&) {}
+private:
+  move_accept_handler(const move_accept_handler&) {}
+};
+#endif // defined(ASIO_HAS_MOVE)
+
 void test()
 {
   using namespace asio;
@@ -728,7 +742,8 @@ void test()
     ip::tcp::acceptor acceptor4(ios, ip::tcp::endpoint(ip::tcp::v4(), 0));
     ip::tcp::acceptor acceptor5(ios, ip::tcp::endpoint(ip::tcp::v6(), 0));
 #if !defined(ASIO_WINDOWS_RUNTIME)
-    int native_acceptor1 = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ip::tcp::acceptor::native_handle_type native_acceptor1
+      = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     ip::tcp::acceptor acceptor6(ios, ip::tcp::v4(), native_acceptor1);
 #endif // !defined(ASIO_WINDOWS_RUNTIME)
 
@@ -756,9 +771,11 @@ void test()
     acceptor1.open(ip::tcp::v6(), ec);
 
 #if !defined(ASIO_WINDOWS_RUNTIME)
-    int native_acceptor2 = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ip::tcp::acceptor::native_handle_type native_acceptor2
+      = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     acceptor1.assign(ip::tcp::v4(), native_acceptor2);
-    int native_acceptor3 = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ip::tcp::acceptor::native_handle_type native_acceptor3
+      = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     acceptor1.assign(ip::tcp::v4(), native_acceptor3, ec);
 #endif // !defined(ASIO_WINDOWS_RUNTIME)
 
@@ -822,12 +839,27 @@ void test()
     acceptor1.accept(peer_socket, peer_endpoint);
     acceptor1.accept(peer_socket, peer_endpoint, ec);
 
+#if defined(ASIO_HAS_MOVE)
+    peer_socket = acceptor1.accept();
+    peer_socket = acceptor1.accept(ios);
+    peer_socket = acceptor1.accept(peer_endpoint);
+    peer_socket = acceptor1.accept(ios, peer_endpoint);
+    (void)peer_socket;
+#endif // defined(ASIO_HAS_MOVE)
+
     acceptor1.async_accept(peer_socket, accept_handler());
     acceptor1.async_accept(peer_socket, peer_endpoint, accept_handler());
     int i2 = acceptor1.async_accept(peer_socket, lazy);
     (void)i2;
     int i3 = acceptor1.async_accept(peer_socket, peer_endpoint, lazy);
     (void)i3;
+
+#if defined(ASIO_HAS_MOVE)
+    acceptor1.async_accept(move_accept_handler());
+    acceptor1.async_accept(ios, move_accept_handler());
+    acceptor1.async_accept(peer_endpoint, move_accept_handler());
+    acceptor1.async_accept(ios, peer_endpoint, move_accept_handler());
+#endif // defined(ASIO_HAS_MOVE)
   }
   catch (std::exception&)
   {

@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
 <!--
-  Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+  Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 
   Distributed under the Boost Software License, Version 1.0. (See accompanying
   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,7 +26,7 @@
 -->
 <xsl:template match="/doxygen">
 <xsl:text>[/
- / Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+ / Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
  /
  / Distributed under the Boost Software License, Version 1.0. (See accompanying
  / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,6 +37,7 @@
 [xinclude quickref.xml]
 
 [include requirements/asynchronous_operations.qbk]
+[include requirements/AcceptableProtocol.qbk]
 [include requirements/AcceptHandler.qbk]
 [include requirements/AsyncRandomAccessReadDevice.qbk]
 [include requirements/AsyncRandomAccessWriteDevice.qbk]
@@ -51,6 +52,7 @@
 [include requirements/ConvertibleToMutableBuffer.qbk]
 [include requirements/DatagramSocketService.qbk]
 [include requirements/DescriptorService.qbk]
+[include requirements/DynamicBufferSequence.qbk]
 [include requirements/Endpoint.qbk]
 [include requirements/Executor.qbk]
 [include requirements/GettableSerialPortOption.qbk]
@@ -1474,6 +1476,9 @@
         <xsl:when test="declname = 'ExecutionContext'">
           <xsl:value-of select="declname"/>
         </xsl:when>
+        <xsl:when test="declname = 'Executor'">
+          <xsl:value-of select="concat('``[link asio.reference.Executor1 ', declname, ']``')"/>
+        </xsl:when>
         <xsl:when test="declname = 'Function'">
           <xsl:value-of select="declname"/>
         </xsl:when>
@@ -1490,7 +1495,7 @@
           <xsl:value-of select="declname"/>
         </xsl:when>
         <xsl:when test="declname = 'OtherExecutor'">
-          <xsl:value-of select="concat('``[link asio.reference.Executor ', declname, ']``')"/>
+          <xsl:value-of select="concat('``[link asio.reference.Executor1 ', declname, ']``')"/>
         </xsl:when>
         <xsl:when test="declname = 'OtherHandler'">
           <xsl:value-of select="declname"/>

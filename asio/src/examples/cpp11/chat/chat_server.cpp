@@ -2,7 +2,7 @@
 // chat_server.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -171,8 +171,7 @@ class chat_server
 public:
   chat_server(asio::io_service& io_service,
       const tcp::endpoint& endpoint)
-    : acceptor_(io_service, endpoint),
-      socket_(io_service)
+    : acceptor_(io_service, endpoint)
   {
     do_accept();
   }
@@ -180,12 +179,12 @@ public:
 private:
   void do_accept()
   {
-    acceptor_.async_accept(socket_,
-        [this](std::error_code ec)
+    acceptor_.async_accept(
+        [this](std::error_code ec, tcp::socket socket)
         {
           if (!ec)
           {
-            std::make_shared<chat_session>(std::move(socket_), room_)->start();
+            std::make_shared<chat_session>(std::move(socket), room_)->start();
           }
 
           do_accept();
@@ -193,7 +192,6 @@ private:
   }
 
   tcp::acceptor acceptor_;
-  tcp::socket socket_;
   chat_room room_;
 };
 

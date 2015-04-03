@@ -2,7 +2,7 @@
 // spawn.hpp
 // ~~~~~~~~~
 //
-// Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -189,6 +189,21 @@ typedef basic_yield_context<
  * } @endcode
  */
 /*@{*/
+
+/// Start a new stackful coroutine, calling the specified handler when it
+/// completes.
+/**
+ * This function is used to launch a new coroutine.
+ *
+ * @param function The coroutine function. The function must have the signature:
+ * @code void function(basic_yield_context<Handler> yield); @endcode
+ *
+ * @param attributes Boost.Coroutine attributes used to customise the coroutine.
+ */
+template <typename Function>
+void spawn(ASIO_MOVE_ARG(Function) function,
+    const boost::coroutines::attributes& attributes
+      = boost::coroutines::attributes());
 
 /// Start a new stackful coroutine, calling the specified handler when it
 /// completes.

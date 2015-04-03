@@ -2,7 +2,7 @@
 // execution_context.hpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <typeinfo>
 #include "asio/detail/noncopyable.hpp"
+#include "asio/detail/variadic_templates.hpp"
 
 #include "asio/detail/push_options.hpp"
 
@@ -211,7 +212,7 @@ public:
    * given service type. If there is no existing implementation of the service,
    * then the io_service will create a new instance of the service.
    *
-   * @param i The io_service object that owns the service.
+   * @param ios The io_service object that owns the service.
    *
    * @return The service interface implementing the specified service type.
    * Ownership of the service interface is not transferred to the caller.
@@ -220,9 +221,48 @@ public:
    * that inherit from io_service::service.
    */
   template <typename Service>
-  friend Service& use_service(io_service& i);
+  friend Service& use_service(io_service& ios);
 
-  /// Add a service object to the execution_context.
+#if defined(GENERATING_DOCUMENTATION)
+
+  /// Creates a service object and adds it to the execution_context.
+  /**
+   * This function is used to add a service to the execution_context.
+   *
+   * @param e The execution_context object that owns the service.
+   *
+   * @param args Zero or more arguments to be passed to the service
+   * constructor.
+   *
+   * @throws asio::service_already_exists Thrown if a service of the
+   * given type is already present in the execution_context.
+   */
+  template <typename Service, typename... Args>
+  friend Service& make_service(execution_context& e, Args&&... args);
+
+#elif defined(ASIO_HAS_VARIADIC_TEMPLATES)
+
+  template <typename Service, typename... Args>
+  friend Service& make_service(execution_context& e,
+      ASIO_MOVE_ARG(Args)... args);
+
+#else // defined(ASIO_HAS_VARIADIC_TEMPLATES)
+
+  template <typename Service>
+  friend Service& make_service(execution_context& e);
+
+#define ASIO_PRIVATE_MAKE_SERVICE_DEF(n) \
+  template <typename Service, ASIO_VARIADIC_TPARAMS(n)> \
+  friend Service& make_service(execution_context& e, \
+      ASIO_VARIADIC_MOVE_PARAMS(n)); \
+  /**/
+  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_MAKE_SERVICE_DEF)
+#undef ASIO_PRIVATE_MAKE_SERVICE_DEF
+
+#endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
+
+  /// (Deprecated: Use make_service().) Add a service object to the
+  /// execution_context.
   /**
    * This function is used to add a service to the execution_context.
    *
