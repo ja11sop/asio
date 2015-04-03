@@ -3,10 +3,10 @@ import os
 
 
 cuppa.add_option( '--enable-separate-compilation', dest='enable-separate-compilation', action='store_true',
-                  help='Enable separate compilation of asio source' )
+        help='Enable separate compilation of asio source' )
 
 cuppa.add_option( '--standalone', dest='standalone', action='store_true',
-                  help='Build as a standalone library, separate from boost. To run examples depending on boost, set --boost-home' )
+        help='Build as a standalone library, separate from boost. To run examples depending on boost, set --boost-location or --boost-latest' )
 
 
 

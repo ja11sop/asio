@@ -28,7 +28,7 @@ if not 'STANDALONE' in env:
 def BuildTests( sources, LIBS=[] ):
 
     def unit_test( sources ):
-        return [ 'unit/unit_test.cpp' ] + Flatten( [ sources ] )
+        return Flatten( [ sources ] )
 
     for source in sources:
         env.BuildTest( name_from( source ), unit_test( source ), LIBS=LIBS )

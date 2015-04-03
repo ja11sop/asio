@@ -1,5 +1,7 @@
 Import('env')
 
+env.StdCpp( 'c++03' )
+
 if 'STANDALONE' in env:
     Return()
 
@@ -134,11 +136,7 @@ if env.Using('boost'):
     env.Build(
             "spawn_echo_server",
             'spawn/echo_server.cpp',
-            STATICLIBS = [
-                env.BoostStaticLibrary( 'coroutine' ),
-                env.BoostStaticLibrary( 'context' ),
-                env.BoostStaticLibrary( 'thread' ),
-                env.BoostStaticLibrary( 'system' ) ]
+            STATICLIBS = env.BoostStaticLibs( [ 'coroutine' ] )
     )
 
 

@@ -1,5 +1,7 @@
 Import('env')
 
+env.StdCpp( 'c++14' )
+
 examples = {
 
     "executors_actor"               : 'executors/actor.cpp',
